@@ -1,13 +1,16 @@
-title,genre,mood
-The Hangover,Comedy,Happy
-Mean Girls,Comedy,Happy
-Barbie,Comedy,Happy
-Interstellar,Sci-Fi,Motivated
-Rocky,Sports,Motivated
-Dangal,Sports,Motivated
-The Notebook,Romance,Romantic
-Titanic,Romance,Romantic
-La La Land,Romance,Romantic
-Inside Out,Animation,Sad
-Up,Animation,Sad
-The Pursuit of Happyness,Drama,Sad
+title,genre,mood,poster
+The Hangover,Comedy,Happy,https://images.unsplash.com/photo-1489599849927-2ee91cede3ba
+Mean Girls,Comedy,Happy,https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c
+Barbie,Comedy,Happy,https://images.unsplash.com/photo-1536440136628-849c177e76a1
+
+Interstellar,Sci-Fi,Motivated,https://images.unsplash.com/photo-1446776811953-b23d57bd21aa
+Rocky,Sports,Motivated,https://images.unsplash.com/photo-1517836357463-d25dfeac3438
+Dangal,Sports,Motivated,https://images.unsplash.com/photo-1544717305-2782549b5136
+
+The Notebook,Romance,Romantic,https://images.unsplash.com/photo-1517841905240-472988babdf9
+Titanic,Romance,Romantic,https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2
+La La Land,Romance,Romantic,https://images.unsplash.com/photo-1485846234645-a62644f84728
+
+Inside Out,Animation,Sad,https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4
+Up,Animation,Sad,https://images.unsplash.com/photo-1478720568477-152d9b164e26
+The Pursuit of Happyness,Drama,Sad,https://images.unsplash.com/photo-1485846234645-a62644f84728
