@@ -9,128 +9,198 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #0f0f0f;
-        color: white;
-    }
-
-    h1 {
-        color: #e50914;
-        font-size: 56px;
-        font-weight: 800;
-    }
-
-    h2, h3, p, label {
-        color: white !important;
-    }
-
-    .subtitle {
-        color: #cccccc;
-        font-size: 20px;
-        margin-bottom: 30px;
-    }
-
-    .movie-card {
-        background-color: #1a1a1a;
-        padding: 20px;
-        border-radius: 18px;
-        border: 1px solid #333;
-        margin-bottom: 25px;
-    }
-
-    .movie-title {
-        font-size: 30px;
-        font-weight: 700;
-        color: white;
-    }
-
-    .genre {
-        color: #bbbbbb !important;
-        font-size: 18px;
-    }
-
-    .rating {
-        color: #ffd700 !important;
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    .mood-badge {
-        background-color: #e50914;
-        color: white;
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 15px;
-        font-weight: bold;
-        display: inline-block;
-        margin-top: 5px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 if "favorites" not in st.session_state:
     st.session_state.favorites = []
 
+st.markdown("""
+<style>
+
+.stApp{
+    background:#0b0b0b;
+}
+
+h1{
+    color:#E50914;
+    font-size:56px;
+    font-weight:800;
+}
+
+.movie-card{
+    background:#181818;
+    border:1px solid #333;
+    border-radius:18px;
+    padding:25px;
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+.movie-title{
+    color:white;
+    font-size:30px;
+    font-weight:bold;
+}
+
+.movie-detail{
+    color:#d0d0d0;
+    font-size:18px;
+}
+
+.rating{
+    color:gold;
+    font-size:20px;
+    font-weight:bold;
+}
+
+.mood-pill{
+    background:#E50914;
+    color:white;
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:14px;
+    font-weight:bold;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- SIDEBAR ----------
+
 with st.sidebar:
+
     st.title("🎬 MoodFlix")
-    st.write("Your mood-based movie space")
 
     selected_mood = st.selectbox(
-        "Choose your mood",
-        ["Happy", "Sad", "Romantic", "Motivated"]
+        "Choose Mood",
+        ["Happy","Sad","Romantic","Motivated"]
     )
 
-    st.write("---")
+    genre_options = ["All"] + sorted(
+        movies["genre"].unique().tolist()
+    )
+
+    selected_genre = st.selectbox(
+        "Choose Genre",
+        genre_options
+    )
+
+    sort_by_rating = st.checkbox(
+        "Highest Rated First"
+    )
+
+    st.divider()
+
     st.subheader("❤️ Favorites")
 
     if st.session_state.favorites:
-        for fav in st.session_state.favorites:
-            st.write(f"❤️ {fav}")
-    else:
-        st.write("No favorites yet.")
 
-st.title("MoodFlix")
-st.markdown(
-    '<p class="subtitle">Discover movies based on how you feel today.</p>',
-    unsafe_allow_html=True
+        for movie in st.session_state.favorites:
+
+            st.write(f"❤️ {movie}")
+
+    else:
+
+        st.write("No favorites yet")
+
+# ---------- HEADER ----------
+
+st.title("🎬 MoodFlix")
+
+st.write(
+    "Discover movies based on how you feel today."
 )
 
-recommended_movies = movies[movies["mood"] == selected_mood]
+# ---------- FILTER ----------
 
-st.write(f"## {selected_mood} Recommendations")
+recommended_movies = movies[
+    movies["mood"] == selected_mood
+]
 
-for index, movie in recommended_movies.iterrows():
+if selected_genre != "All":
 
-    with st.container():
-        col1, col2 = st.columns([1, 3])
+    recommended_movies = recommended_movies[
+        recommended_movies["genre"] == selected_genre
+    ]
 
-        with col1:
-            st.image(movie["poster"], width=190)
+if sort_by_rating:
 
-        with col2:
-            st.markdown(
-                f"""
-                <div class="movie-card">
-                    <div class="movie-title">🎥 {movie['title']}</div>
-                    <p class="genre">Genre: {movie['genre']}</p>
-                    <p class="rating">⭐ Rating: {movie['rating']}/10</p>
-                    <span class="mood-badge">{movie['mood']}</span>
-                </div>
-                """,
-                unsafe_allow_html=True
-            )
+    recommended_movies = recommended_movies.sort_values(
+        by="rating",
+        ascending=False
+    )
 
-            if st.button("❤️ Add to Favorites", key=f"fav_{movie['title']}"):
-                if movie["title"] not in st.session_state.favorites:
-                    st.session_state.favorites.append(movie["title"])
-                    st.success(f"{movie['title']} added to favorites!")
-                else:
-                    st.info(f"{movie['title']} is already in favorites.")
+st.write(
+    f"## {selected_mood} Recommendations"
+)
 
-st.write("---")
-st.caption("Built with Python, Streamlit, and Pandas")
+# ---------- MOVIES ----------
+
+for _, movie in recommended_movies.iterrows():
+
+    poster_col, card_col = st.columns([1,2])
+
+    with poster_col:
+
+        st.image(
+            movie["poster"],
+            width=180
+        )
+
+    with card_col:
+
+        st.markdown(
+            f"""
+            <div class="movie-card">
+
+            <div class="movie-title">
+            🎥 {movie['title']}
+            </div>
+
+            <br>
+
+            <div class="movie-detail">
+            🎭 Genre: {movie['genre']}
+            </div>
+
+            <br>
+
+            <div class="rating">
+            ⭐ {movie['rating']}/10
+            </div>
+
+            <br>
+
+            <span class="mood-pill">
+            {movie['mood']}
+            </span>
+
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        if st.button(
+            "❤️ Favorite",
+            key=f"fav_{movie['title']}"
+        ):
+
+            if movie["title"] not in st.session_state.favorites:
+
+                st.session_state.favorites.append(
+                    movie["title"]
+                )
+
+                st.success(
+                    f"{movie['title']} added!"
+                )
+
+            else:
+
+                st.info(
+                    "Already in favorites"
+                )
+
+    st.divider()
+
+st.caption(
+    "Built with Python • Streamlit • Pandas"
+)
