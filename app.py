@@ -12,9 +12,11 @@ st.set_page_config(
 if "favorites" not in st.session_state:
     st.session_state.favorites = []
 
+if "watchlist" not in st.session_state:
+    st.session_state.watchlist = []
+
 st.markdown("""
 <style>
-
 .stApp{
     background:#0b0b0b;
 }
@@ -59,148 +61,121 @@ h1{
     font-size:14px;
     font-weight:bold;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- SIDEBAR ----------
-
 with st.sidebar:
-
     st.title("🎬 MoodFlix")
+
+    search_text = st.text_input("Search movie")
 
     selected_mood = st.selectbox(
         "Choose Mood",
-        ["Happy","Sad","Romantic","Motivated"]
+        ["All", "Happy", "Sad", "Romantic", "Motivated"]
     )
 
-    genre_options = ["All"] + sorted(
-        movies["genre"].unique().tolist()
-    )
+    genre_options = ["All"] + sorted(movies["genre"].unique().tolist())
 
     selected_genre = st.selectbox(
         "Choose Genre",
         genre_options
     )
 
-    sort_by_rating = st.checkbox(
-        "Highest Rated First"
-    )
+    sort_by_rating = st.checkbox("Highest Rated First")
 
     st.divider()
 
     st.subheader("❤️ Favorites")
-
     if st.session_state.favorites:
-
         for movie in st.session_state.favorites:
-
             st.write(f"❤️ {movie}")
-
     else:
-
         st.write("No favorites yet")
 
-# ---------- HEADER ----------
+    st.divider()
+
+    st.subheader("📋 Watchlist")
+    if st.session_state.watchlist:
+        for movie in st.session_state.watchlist:
+            st.write(f"📌 {movie}")
+    else:
+        st.write("No watchlist movies yet")
 
 st.title("🎬 MoodFlix")
+st.write("Discover movies based on how you feel today.")
 
-st.write(
-    "Discover movies based on how you feel today."
-)
+filtered_movies = movies.copy()
 
-# ---------- FILTER ----------
+if search_text:
+    filtered_movies = filtered_movies[
+        filtered_movies["title"].str.contains(
+            search_text,
+            case=False,
+            na=False
+        )
+    ]
 
-recommended_movies = movies[
-    movies["mood"] == selected_mood
-]
+if selected_mood != "All":
+    filtered_movies = filtered_movies[
+        filtered_movies["mood"] == selected_mood
+    ]
 
 if selected_genre != "All":
-
-    recommended_movies = recommended_movies[
-        recommended_movies["genre"] == selected_genre
+    filtered_movies = filtered_movies[
+        filtered_movies["genre"] == selected_genre
     ]
 
 if sort_by_rating:
-
-    recommended_movies = recommended_movies.sort_values(
+    filtered_movies = filtered_movies.sort_values(
         by="rating",
         ascending=False
     )
 
-st.write(
-    f"## {selected_mood} Recommendations"
-)
+st.write("## Movie Recommendations")
 
-# ---------- MOVIES ----------
+if filtered_movies.empty:
+    st.warning("No movies found. Try another search or filter.")
 
-for _, movie in recommended_movies.iterrows():
-
-    poster_col, card_col = st.columns([1,2])
+for _, movie in filtered_movies.iterrows():
+    poster_col, card_col = st.columns([1, 2])
 
     with poster_col:
-
-        st.image(
-            movie["poster"],
-            width=180
-        )
+        st.image(movie["poster"], width=180)
 
     with card_col:
-
         st.markdown(
             f"""
             <div class="movie-card">
-
-            <div class="movie-title">
-            🎥 {movie['title']}
-            </div>
-
-            <br>
-
-            <div class="movie-detail">
-            🎭 Genre: {movie['genre']}
-            </div>
-
-            <br>
-
-            <div class="rating">
-            ⭐ {movie['rating']}/10
-            </div>
-
-            <br>
-
-            <span class="mood-pill">
-            {movie['mood']}
-            </span>
-
+                <div class="movie-title">🎥 {movie['title']}</div>
+                <br>
+                <div class="movie-detail">🎭 Genre: {movie['genre']}</div>
+                <br>
+                <div class="rating">⭐ {movie['rating']}/10</div>
+                <br>
+                <span class="mood-pill">{movie['mood']}</span>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        if st.button(
-            "❤️ Favorite",
-            key=f"fav_{movie['title']}"
-        ):
+        button_col1, button_col2 = st.columns(2)
 
-            if movie["title"] not in st.session_state.favorites:
+        with button_col1:
+            if st.button("❤️ Favorite", key=f"fav_{movie['title']}"):
+                if movie["title"] not in st.session_state.favorites:
+                    st.session_state.favorites.append(movie["title"])
+                    st.success(f"{movie['title']} added to favorites!")
+                else:
+                    st.info("Already in favorites")
 
-                st.session_state.favorites.append(
-                    movie["title"]
-                )
-
-                st.success(
-                    f"{movie['title']} added!"
-                )
-
-            else:
-
-                st.info(
-                    "Already in favorites"
-                )
+        with button_col2:
+            if st.button("📋 Watchlist", key=f"watch_{movie['title']}"):
+                if movie["title"] not in st.session_state.watchlist:
+                    st.session_state.watchlist.append(movie["title"])
+                    st.success(f"{movie['title']} added to watchlist!")
+                else:
+                    st.info("Already in watchlist")
 
     st.divider()
 
-st.caption(
-    "Built with Python • Streamlit • Pandas"
-)
+st.caption("Built with Python • Streamlit • Pandas")
