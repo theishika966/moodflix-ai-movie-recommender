@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-movies = pd.read_csv("movies.csv")
+movies = pd.read_csv("backend/movies.csv")
 
 st.set_page_config(
     page_title="MoodFlix",
@@ -9,173 +9,164 @@ st.set_page_config(
     layout="wide"
 )
 
-if "favorites" not in st.session_state:
-    st.session_state.favorites = []
-
 if "watchlist" not in st.session_state:
     st.session_state.watchlist = []
 
+if "favorites" not in st.session_state:
+    st.session_state.favorites = []
+
+if "selected_movie" not in st.session_state:
+    st.session_state.selected_movie = None
+
+if "hero_movie" not in st.session_state:
+    st.session_state.hero_movie = movies.sample(1).iloc[0]["title"]
+
+
+def open_details(title):
+    st.session_state.selected_movie = title
+    st.rerun()
+
+
+def show_details(title):
+    movie = movies[movies["title"] == title].iloc[0]
+
+    if st.button("⬅ Back to Home"):
+        st.session_state.selected_movie = None
+        st.rerun()
+
+    col1, col2 = st.columns([1, 2])
+
+    with col1:
+        st.image(movie["poster"], width=320)
+
+    with col2:
+        st.title(movie["title"])
+        st.write(f"⭐ **{movie['rating']}/10**")
+        st.write(f"**Genre:** {movie['genre']}")
+        st.write(f"**Mood:** {movie['mood']}")
+        st.write(f"**Year:** {movie['release_year']}")
+        st.write(f"**Runtime:** {movie['runtime']}")
+        st.write(movie["description"])
+
+    st.write("---")
+    st.write("## More Like This")
+
+    similar = movies[
+        (movies["title"] != movie["title"]) &
+        (
+            (movies["genre"] == movie["genre"]) |
+            (movies["mood"] == movie["mood"])
+        )
+    ].head(4)
+
+    show_movie_row(similar, "similar")
+
+
+def show_movie_row(data, key_prefix):
+    cols = st.columns(4)
+
+    for index, (_, movie) in enumerate(data.head(4).iterrows()):
+        with cols[index]:
+            st.image(movie["poster"], width=160)
+            st.write(f"**{movie['title']}**")
+            st.write(f"⭐ {movie['rating']}/10")
+
+            if st.button("View Details", key=f"{key_prefix}_{movie['title']}"):
+                open_details(movie["title"])
+
+
 st.markdown("""
 <style>
-.stApp{
-    background:#0b0b0b;
+.stApp {
+    background-color: #0b0b0b;
+    color: white;
 }
 
-h1{
-    color:#E50914;
-    font-size:56px;
-    font-weight:800;
+h1 {
+    color: #e50914;
+    font-size: 60px;
+    font-weight: 900;
 }
 
-.movie-card{
-    background:#181818;
-    border:1px solid #333;
-    border-radius:18px;
-    padding:25px;
-    margin-top:20px;
-    margin-bottom:20px;
+h2, h3, p {
+    color: white;
 }
 
-.movie-title{
-    color:white;
-    font-size:30px;
-    font-weight:bold;
+.hero-box {
+    background: linear-gradient(90deg, #111111, #1f1f1f);
+    padding: 35px;
+    border-radius: 24px;
+    border: 1px solid #333;
 }
 
-.movie-detail{
-    color:#d0d0d0;
-    font-size:18px;
+.hero-title {
+    color: white;
+    font-size: 46px;
+    font-weight: 900;
 }
 
-.rating{
-    color:gold;
-    font-size:20px;
-    font-weight:bold;
-}
-
-.mood-pill{
-    background:#E50914;
-    color:white;
-    padding:6px 14px;
-    border-radius:20px;
-    font-size:14px;
-    font-weight:bold;
+.hero-text {
+    color: #cccccc;
+    font-size: 18px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-with st.sidebar:
+
+if st.session_state.selected_movie:
+    show_details(st.session_state.selected_movie)
+
+else:
     st.title("🎬 MoodFlix")
 
-    search_text = st.text_input("Search movie")
+    hero = movies[movies["title"] == st.session_state.hero_movie].iloc[0]
 
-    selected_mood = st.selectbox(
-        "Choose Mood",
-        ["All", "Happy", "Sad", "Romantic", "Motivated"]
-    )
-
-    genre_options = ["All"] + sorted(movies["genre"].unique().tolist())
-
-    selected_genre = st.selectbox(
-        "Choose Genre",
-        genre_options
-    )
-
-    sort_by_rating = st.checkbox("Highest Rated First")
-
-    st.divider()
-
-    st.subheader("❤️ Favorites")
-    if st.session_state.favorites:
-        for movie in st.session_state.favorites:
-            st.write(f"❤️ {movie}")
-    else:
-        st.write("No favorites yet")
-
-    st.divider()
-
-    st.subheader("📋 Watchlist")
-    if st.session_state.watchlist:
-        for movie in st.session_state.watchlist:
-            st.write(f"📌 {movie}")
-    else:
-        st.write("No watchlist movies yet")
-
-st.title("🎬 MoodFlix")
-st.write("Discover movies based on how you feel today.")
-
-filtered_movies = movies.copy()
-
-if search_text:
-    filtered_movies = filtered_movies[
-        filtered_movies["title"].str.contains(
-            search_text,
-            case=False,
-            na=False
-        )
-    ]
-
-if selected_mood != "All":
-    filtered_movies = filtered_movies[
-        filtered_movies["mood"] == selected_mood
-    ]
-
-if selected_genre != "All":
-    filtered_movies = filtered_movies[
-        filtered_movies["genre"] == selected_genre
-    ]
-
-if sort_by_rating:
-    filtered_movies = filtered_movies.sort_values(
-        by="rating",
-        ascending=False
-    )
-
-st.write("## Movie Recommendations")
-
-if filtered_movies.empty:
-    st.warning("No movies found. Try another search or filter.")
-
-for _, movie in filtered_movies.iterrows():
-    poster_col, card_col = st.columns([1, 2])
+    poster_col, info_col = st.columns([1, 2])
 
     with poster_col:
-        st.image(movie["poster"], width=180)
+        st.image(hero["poster"], width=300)
 
-    with card_col:
+    with info_col:
         st.markdown(
             f"""
-            <div class="movie-card">
-                <div class="movie-title">🎥 {movie['title']}</div>
+            <div class="hero-box">
+                <div class="hero-title">{hero['title']}</div>
                 <br>
-                <div class="movie-detail">🎭 Genre: {movie['genre']}</div>
+                <div class="hero-text">⭐ {hero['rating']}/10</div>
+                <div class="hero-text">{hero['release_year']} • {hero['runtime']} • {hero['genre']}</div>
                 <br>
-                <div class="rating">⭐ {movie['rating']}/10</div>
-                <br>
-                <span class="mood-pill">{movie['mood']}</span>
+                <div class="hero-text">{hero['description']}</div>
             </div>
             """,
             unsafe_allow_html=True
         )
 
-        button_col1, button_col2 = st.columns(2)
+        col1, col2 = st.columns(2)
 
-        with button_col1:
-            if st.button("❤️ Favorite", key=f"fav_{movie['title']}"):
-                if movie["title"] not in st.session_state.favorites:
-                    st.session_state.favorites.append(movie["title"])
-                    st.success(f"{movie['title']} added to favorites!")
-                else:
-                    st.info("Already in favorites")
+        with col1:
+            if st.button("▶ View Details"):
+                open_details(hero["title"])
 
-        with button_col2:
-            if st.button("📋 Watchlist", key=f"watch_{movie['title']}"):
-                if movie["title"] not in st.session_state.watchlist:
-                    st.session_state.watchlist.append(movie["title"])
-                    st.success(f"{movie['title']} added to watchlist!")
-                else:
-                    st.info("Already in watchlist")
+        with col2:
+            if st.button("🔄 New Hero"):
+                st.session_state.hero_movie = movies.sample(1).iloc[0]["title"]
+                st.rerun()
 
-    st.divider()
+    st.write("---")
 
-st.caption("Built with Python • Streamlit • Pandas")
+    st.write("## 🔥 Trending Now")
+    show_movie_row(movies.sort_values(by="rating", ascending=False), "trending")
+
+    st.write("## 😊 Happy Picks")
+    show_movie_row(movies[movies["mood"] == "Happy"], "happy")
+
+    st.write("## 💕 Romantic Picks")
+    show_movie_row(movies[movies["mood"] == "Romantic"], "romantic")
+
+    st.write("## 🚀 Motivated Picks")
+    show_movie_row(movies[movies["mood"] == "Motivated"], "motivated")
+
+    st.write("## 😢 Emotional Picks")
+    show_movie_row(movies[movies["mood"] == "Sad"], "sad")
+
+    st.caption("Built with Python • Streamlit • Pandas")

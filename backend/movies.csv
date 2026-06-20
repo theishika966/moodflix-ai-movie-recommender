@@ -1,0 +1,16 @@
+title,genre,mood,poster,rating,release_year,runtime,description,keywords
+The Hangover,Comedy,Happy,https://image.tmdb.org/t/p/w500/uluhlXubGu1VxU63X9VHCLWDAYP.jpg,7.7,2009,100 min,A comedy about friends dealing with a wild night in Las Vegas.,laugh fun relax comedy friends
+Mean Girls,Comedy,Happy,https://image.tmdb.org/t/p/w500/fXm3YKXAEjx7d2tIWDg9TfRZtsU.jpg,7.1,2004,97 min,A teen comedy about high school friendships popularity and drama.,fun school laugh comedy teen
+Barbie,Comedy,Happy,https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg,6.8,2023,114 min,A colorful comedy adventure about identity confidence and self-discovery.,fun happy colorful comedy identity
+
+Interstellar,Sci-Fi,Motivated,https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg,8.7,2014,169 min,A sci-fi journey about space survival love and saving humanity.,space dream ambition science motivation
+Rocky,Sports,Motivated,https://image.tmdb.org/t/p/w500/cqxg1CihGR5ge0i1wYXr4Rdeppu.jpg,8.1,1976,120 min,A boxer gets a chance to prove himself through discipline and courage.,gym boxing motivation success sports
+Dangal,Sports,Motivated,https://image.tmdb.org/t/p/w500/p2lVAcPuRPSO8Al6hDDGw0OgMi8.jpg,8.3,2016,161 min,A sports drama about wrestling family discipline and determination.,sports motivation family wrestling success
+
+The Notebook,Romance,Romantic,https://image.tmdb.org/t/p/w500/rNzQyW4f8B8cQeg7Dgj3n6eT5k9.jpg,7.8,2004,123 min,A romantic drama about love memories and a relationship tested by time.,love relationship couple romance emotional
+Titanic,Romance,Romantic,https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg,7.9,1997,195 min,A romantic epic about love and tragedy aboard the Titanic.,love romance relationship emotional tragedy
+La La Land,Romance,Romantic,https://image.tmdb.org/t/p/w500/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg,8.0,2016,128 min,A musical romance about dreams love career and choices.,love music dreams romance relationship
+
+Inside Out,Animation,Sad,https://image.tmdb.org/t/p/w500/2H1TmgdfNtsKlU9jKdeNyYL5y8T.jpg,8.1,2015,95 min,An animated story about emotions growing up and understanding sadness.,feelings emotions sad family growing
+Up,Animation,Sad,https://image.tmdb.org/t/p/w500/vpbaStTMt8qqXaEgnOR2EE4DNJk.jpg,8.3,2009,96 min,An emotional animated adventure about love loss memories and hope.,loss memories emotional hope adventure
+The Pursuit of Happyness,Drama,Sad,https://image.tmdb.org/t/p/w500/lBYOKAMcxIvuk9s9hMuecB9dPBV.jpg,8.0,2006,117 min,An inspiring drama about struggle fatherhood persistence and hope.,sad struggle success hope emotional
